@@ -170,7 +170,7 @@ class Game {
         if (!snakePositions[x + y * X_CELLS]) emptyPositions.push(new Point(x, y));
       }
     }
-    const randomNum = Math.floor(Math.random() * (emptyPositions.length + 1));
+    const randomNum = Math.floor(Math.random() * emptyPositions.length);
     this.foodPosition = emptyPositions[randomNum];
   }
 
