@@ -63,12 +63,12 @@ class LinkedList {
 
 // УТИЛИТАРНЫЕ ФУНКЦИИ
 
-// Возвращает минуты и секунды, прошедшие между первой и второй датой
+// Возвращает минуты и секунды, прошедшие между первой и второй датой, в виде строки
 function timePassed(d1, d2) {
   const dateDiff = d1 - d2;
   const minutesPassed = Math.floor(dateDiff / (60 * 1000));
   const secondsPassed = Math.floor((dateDiff / 1000) % 60);
-  return `${minutesPassed}:${secondsPassed <= 9 ? "0" + secondsPassed : secondsPassed}`;
+  return `${minutesPassed}:${secondsPassed.toString().padStart(2, '0')}`; // Секунды должны состоять из двух символов всегда (заполняем нулями слева, если секунды однозначные)
 }
 
 // УЗЛЫ (NODES)
@@ -84,9 +84,9 @@ const COLORS = {
   snakeColor: "#247AFB",
   foodColor: "#F84F4E",
 };
-const CELL_SIZE = 48;
-const X_CELLS = 10;
-const Y_CELLS = 10;
+const CELL_SIZE = 48; // Размер клетки в пикселях
+const X_CELLS = 10; // Размер поля по горизонтали (ось x) в количестве клеток
+const Y_CELLS = 10;// Размер поля по вертикали (ось y) в количестве клеток
 
 // ЛОГИКА ИГРЫ
 
@@ -132,62 +132,76 @@ class Game {
 
     this.snake = new LinkedList(); // Змея, представленная в виде связного списка
 
-    // Функция, нужная для корректного добавления и удаления слушателя событий
+    // Функция, нужная для корректного добавления и удаления слушателей событий
     this.onKeyPress = this.handleKeyDown.bind(this);
   }
 
+  // Основный метод, который вызывается каждый кадр (количество кадров в секунду зависит от браузера)
   update() {
     statsGameTime.innerText = timePassed(Date.now(), this.stats.started);
 
     this.moveSnake();
     this.checkSnakeCollision();
-    if (!this.gameOver && this.isFoodEated()) {
-      this.genFood();
-      statsCurrentScore.innerText = ++this.stats.score;
+    if (!this.gameOver && this.isFoodAte) { // Если еда съедена, то
+      this.genFood(); // Генерируем новую еду
+      statsCurrentScore.innerText = ++this.stats.score; // И добавляем 1 к счёту игры
     }
 
     this.draw();
-    if (this.gameOver) {
+    if (this.gameOver) { // Прекращаем анимацию, если игра окончена
       this.stop();
     } else this.raf = requestAnimationFrame(this.update.bind(this));
   }
 
+  // Метод генерации еды. Работает следующим образом:
+  // 1. Находим все позиции змеи и запоминаем, где она есть;
+  // 2. Создаём массив пустых клеток, то есть клеток, где змеи нет;
+  // 3. Генерируем случайное число, которое может быть от 0 до размера массива пустых клеток;
+  // 4. Берём из массива элемент по индексу случайно сгенерированного числа - это и есть случайная пустая клетка
   genFood() {
+    // 1 шаг
     const snakePositions = new Array(X_CELLS * Y_CELLS);
     let snakePart = this.snake.head;
     while (snakePart) {
-      snakePositions[snakePart.value.point.x + snakePart.value.point.y * X_CELLS] = 1;
+      snakePositions[snakePart.value.point.x + snakePart.value.point.y * X_CELLS] = 1; 
       snakePart = snakePart.next;
     }
 
-    const emptyPositions = [];
+    // 2 шаг
+    const emptyPositions = []; 
     for (let x = 0; x < X_CELLS; x++) {
       for (let y = 0; y < Y_CELLS; y++) {
         if (!snakePositions[x + y * X_CELLS]) emptyPositions.push(new Point(x, y));
       }
     }
+    // 3 шаг 
     const randomNum = Math.floor(Math.random() * emptyPositions.length);
+    // 4 шаг 
     this.foodPosition = emptyPositions[randomNum];
   }
 
+  // Метод, который обрабатывает нажатия клавиш пользователем
   handleKeyDown(event) {
-    /* Движение на стрелочках. При нажатии нужной стрелочки устанавливает текущее направление головы, если это возможно */
+    // Движение на стрелочках. При нажатии нужной стрелочки устанавливает текущее направление головы, если это возможно
     if (event.key === "ArrowUp") this.setSnakeDirection(new Point(0, -1));
     else if (event.key === "ArrowRight") this.setSnakeDirection(new Point(1, 0));
     else if (event.key === "ArrowDown") this.setSnakeDirection(new Point(0, 1));
     else if (event.key === "ArrowLeft") this.setSnakeDirection(new Point(-1, 0));
   }
 
+  // Метод, который устанавливает новое направление движения змеи, если это возможно (то есть если она не движется назад)
   setSnakeDirection(dir) {
-    const prevSnakePart = this.snake.head.next.value; // Получаем предыдущую часть змеи, чтобы узнать в каком напрвлении она двигалась
+    const prevSnakePart = this.snake.head.next.value; // Получаем предыдущую часть змеи, чтобы узнать в каком направлении она двигалась
     // Если новое направление не противоположно предыдущему, то устанавливаем новое направление
     if (prevSnakePart.direction.x + dir.x !== 0 && prevSnakePart.direction.y + dir.y !== 0)
       this.snake.head.value.direction = dir;
   }
 
+  // Метод, который обрабатывает движение змеи
   moveSnake() {
-    if (Math.floor(Date.now() / this.snakeSpeed) > Math.floor(this.lastMove / this.snakeSpeed)) {
-      this.lastMove = Date.now();
+    // Если прошло больше миллисекунд с последнего хода, чем скорость змеи, то
+    if (Date.now() - this.lastMove > this.snakeSpeed) {
+      this.lastMove = this.lastMove + this.snakeSpeed; // Устанавливаем новое время последнего движения змеи
       const nextPos = this.snake.head.value.pointPlusDirection(); // Получение новой позиции головы змеи
       // Если змея выходит за границы поля, то она оказывается в другой стороны поля
       if (nextPos.point.x >= X_CELLS) nextPos.point.x -= 10;
@@ -195,36 +209,40 @@ class Game {
       if (nextPos.point.x < 0) nextPos.point.x += 10;
       if (nextPos.point.y < 0) nextPos.point.y += 10;
       this.snake.insertFirst(nextPos);
-      if (!this.isFoodEated()) this.snake.pop();
+      if (!this.isFoodAte) this.snake.pop(); // Если еда не съедена, то удаляем хвост
     }
   }
 
+  // Метод, который проверяет столкновение головы змеи с её телом 
   checkSnakeCollision() {
     const snakeHeadPos = this.snake.head.value.point;
     let snakePart = this.snake.head.next;
-    while (snakePart && !this.gameOver) {
+    while (snakePart && !this.gameOver) { // Перебираем каждую часть змеи, пока не найдём столкновение
       if (
         snakePart.value.point.x === snakeHeadPos.x &&
         snakePart.value.point.y === snakeHeadPos.y
       ) {
-        this.gameOver = true;
+        this.gameOver = true; // Заканчиваем игру, если произошло столкновение
       }
       snakePart = snakePart.next;
     }
   }
 
-  isFoodEated() {
+  // Геттер, который возвращает Boolean съела ли змея еду на этом ходе
+  get isFoodAte() {
     const snakeHeadPos = this.snake.head.value.point;
     return snakeHeadPos.x === this.foodPosition.x && snakeHeadPos.y == this.foodPosition.y;
   }
 
+  // Метод отрисовки всей игры
   draw() {
-    this.ctx.clearRect(0, 0, X_CELLS * CELL_SIZE, Y_CELLS * CELL_SIZE);
+    this.ctx.clearRect(0, 0, X_CELLS * CELL_SIZE, Y_CELLS * CELL_SIZE); // Очищаем старые пиксели
 
     this.drawSnake();
     this.drawFood();
   }
 
+  // Метод отрисовки змеи
   drawSnake() {
     this.ctx.fillStyle = COLORS.snakeColor;
 
@@ -251,6 +269,7 @@ class Game {
     }
   }
 
+  // Метод отрисовки еды
   drawFood() {
     this.ctx.fillStyle = COLORS.foodColor;
     this.ctx.beginPath();
@@ -265,6 +284,7 @@ class Game {
     this.ctx.fill();
   }
 
+  // Метод начала игры (и сброса состояния игры в начальное состояние)
   start() {
     this.raf = requestAnimationFrame(this.update.bind(this));
     this.stats.started = Date.now();
@@ -282,6 +302,7 @@ class Game {
     window.addEventListener("keydown", this.onKeyPress);
   }
 
+  // Метод завершения игры
   stop() {
     cancelAnimationFrame(this.raf);
     this.raf = null;
@@ -295,7 +316,7 @@ class Game {
 }
 
 const gameInstance = new Game(document.getElementById("game-canvas").getContext("2d"));
-startButton.addEventListener("click", () => {
+startButton.addEventListener("click", () => { // Обрабатываем нажатие по кнопке начала или завершения игры
   if (gameInstance.raf) gameInstance.stop();
   else gameInstance.start();
 });
