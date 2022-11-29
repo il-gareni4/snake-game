@@ -73,14 +73,10 @@ function timePassed(d1, d2) {
 
 // УЗЛЫ (NODES)
 
-const canvas = document.getElementById("game-canvas");
 const startButton = document.getElementById("start-button");
 const statsBestScore = document.getElementById("best-score");
 const statsCurrentScore = document.getElementById("current-score");
 const statsGameTime = document.getElementById("game-time");
-
-const ctx = canvas.getContext("2d");
-let raf;
 
 // Константы
 
@@ -298,7 +294,7 @@ class Game {
   }
 }
 
-const gameInstance = new Game(ctx);
+const gameInstance = new Game(document.getElementById("game-canvas").getContext("2d"));
 startButton.addEventListener("click", () => {
   if (gameInstance.raf) gameInstance.stop();
   else gameInstance.start();
