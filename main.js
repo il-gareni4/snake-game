@@ -204,10 +204,10 @@ class Game {
       this.lastMove = this.lastMove + this.snakeSpeed; // Устанавливаем новое время последнего движения змеи
       const nextPos = this.snake.head.value.pointPlusDirection(); // Получение новой позиции головы змеи
       // Если змея выходит за границы поля, то она оказывается в другой стороны поля
-      if (nextPos.point.x >= X_CELLS) nextPos.point.x -= 10;
-      if (nextPos.point.y >= Y_CELLS) nextPos.point.y -= 10;
-      if (nextPos.point.x < 0) nextPos.point.x += 10;
-      if (nextPos.point.y < 0) nextPos.point.y += 10;
+      if (nextPos.point.x >= X_CELLS) nextPos.point.x -= X_CELLS;
+      if (nextPos.point.y >= Y_CELLS) nextPos.point.y -= Y_CELLS;
+      if (nextPos.point.x < 0) nextPos.point.x += X_CELLS;
+      if (nextPos.point.y < 0) nextPos.point.y += Y_CELLS;
       this.snake.insertFirst(nextPos);
       if (!this.isFoodAte) this.snake.pop(); // Если еда не съедена, то удаляем хвост
     }
