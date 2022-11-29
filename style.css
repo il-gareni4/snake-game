@@ -1,0 +1,134 @@
+/* COLORS */
+:root {
+  --background-color: #15161b;
+  --text-color: #ffffff;
+  --dim-text-color: #6c7188;
+  --main-color: #247afb;
+  --l-main-color: #5fa2f9;
+  --d-main-color: #0450d2;
+  --orange-color: #fec22a;
+
+  --field-border-color: #6c7188;
+  --d-cell-color: #252732;
+  --l-cell-color: #2e3242;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+}
+
+svg {
+  fill: inherit;
+}
+
+html {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: 16px;
+}
+
+.container {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: max-content;
+}
+
+button.btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--main-color);
+  transition: background-color 60ms;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+button.btn:hover {
+  background-color: var(--l-main-color);
+}
+
+button.btn:active {
+  background-color: var(--d-main-color);
+}
+
+h6 {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+main {
+  position: relative;
+}
+
+.stats {
+  width: 100%;
+  margin-bottom: 1rem;
+  display: flex;
+}
+
+.stats > * {
+  flex: 1;
+  align-self: flex-end;
+}
+
+.best-score,
+.time {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.best-score svg, .time svg {
+    margin-right: 0.25rem;
+}
+
+.best-score {
+  color: var(--orange-color);
+  fill: var(--orange-color);
+}
+
+.time {
+  color: var(--dim-text-color);
+  fill: var(--dim-text-color);
+  justify-content: flex-end;
+}
+
+.current-score {
+  text-align: center;
+}
+
+.time {
+  text-align: end;
+}
+
+.field {
+  display: grid;
+  border: 1px solid var(--field-border-color);
+  grid-template-columns: repeat(10, 48px);
+}
+
+.field-cell {
+  width: 48px;
+  height: 48px;
+}
+
+.field-cell.d {
+  background-color: var(--d-cell-color);
+}
+
+.field-cell.l {
+  background-color: var(--l-cell-color);
+}
+
+.actions {
+  margin-top: 1.5rem;
+}
