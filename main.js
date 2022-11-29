@@ -206,7 +206,7 @@ class Game {
   checkSnakeCollision() {
     const snakeHeadPos = this.snake.head.value.point;
     let snakePart = this.snake.head.next;
-    while (snakePart) {
+    while (snakePart && !this.gameOver) {
       if (
         snakePart.value.point.x === snakeHeadPos.x &&
         snakePart.value.point.y === snakeHeadPos.y
