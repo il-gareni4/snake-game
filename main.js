@@ -230,11 +230,11 @@ class Game {
   }
 
   drawSnake() {
-    ctx.fillStyle = COLORS.snakeColor;
+    this.ctx.fillStyle = COLORS.snakeColor;
 
     let snakePart = this.snake.head;
     while (snakePart) {
-      ctx.fillRect(
+      this.ctx.fillRect(
         snakePart.value.point.x * CELL_SIZE,
         snakePart.value.point.y * CELL_SIZE,
         CELL_SIZE,
@@ -245,8 +245,8 @@ class Game {
 
     if (this.gameOver) {
       // Рисуем соприкосновение красным
-      ctx.fillStyle = COLORS.foodColor;
-      ctx.fillRect(
+      this.ctx.fillStyle = COLORS.foodColor;
+      this.ctx.fillRect(
         this.snake.head.value.point.x * CELL_SIZE,
         this.snake.head.value.point.y * CELL_SIZE,
         CELL_SIZE,
@@ -256,17 +256,17 @@ class Game {
   }
 
   drawFood() {
-    ctx.fillStyle = COLORS.foodColor;
-    ctx.beginPath();
-    ctx.roundRect(
+    this.ctx.fillStyle = COLORS.foodColor;
+    this.ctx.beginPath();
+    this.ctx.roundRect(
       this.foodPosition.x * CELL_SIZE + 16,
       this.foodPosition.y * CELL_SIZE + 16,
       16,
       16,
       4
     );
-    ctx.closePath();
-    ctx.fill();
+    this.ctx.closePath();
+    this.ctx.fill();
   }
 
   start() {
